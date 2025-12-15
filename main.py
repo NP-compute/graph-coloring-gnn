@@ -13,10 +13,10 @@ SEED_VALUE = 8111
 set_seed(SEED_VALUE)
 
 #Here we specify which dataset to use:
-problem_file = 'queen5_5.col'
+problem_file = 'add_4bit_15_13.col'
 
 # Here we build the graph for the problem
-G = build_color_graph(problem_file)
+G = build_color_graph(problem_file, file_path='./data/input/COLOR/training_graphs/')
 
 #Here we define the hyperparameters
 hypers = {
@@ -28,10 +28,10 @@ hypers = {
     'seed': SEED_VALUE,    # Random seed
     'device': TORCH_DEVICE, # Device to use
     'dtype': TORCH_DTYPE,   # Data type to use
-    'number_epochs': int(1e5),   # Max number training steps
+    'number_epochs': int(1e4*3),   # Max number training steps
     'patience': 500,             # Number early stopping triggers before breaking loop
     'graph_file': problem_file,  # Which problem is being solved
-    'number_colors': chromatic_numbers[problem_file], # Number of colors in the problem
+    'number_colors': 3, # Number of colors in the problem, IMPORTANT NOTE: It is 3 unless the graph is broken like the repo does for processing
     'num_nodes': len(G.nodes) # Number of nodes in the problem
 }
 
@@ -45,7 +45,7 @@ print(f'In this case, the normalized error is: {best_cost/len(G.edges)}')
 node_colors, edge_colors = color_lists(G, best_coloring.cpu(), color_map)
 
 #Here we save the graph with this coloring
-save_graph(G, node_colors, edge_colors, 'queen5-5-gcn', path = 'graphs/')
+save_graph(G, node_colors, edge_colors, 'bit_trainer-gcn', path = 'graphs/')
 
 #Then we plot the graph
 plot_graph(G, node_colors= node_colors, edge_colors=edge_colors, seed=SEED_VALUE, node_size = 100, figsize=8, name='Queen 5-5 Colored')
@@ -61,7 +61,7 @@ results = {
     'Nodes': len(G.nodes),
     'Edges': len(G.edges),
     'Density %':nx.density(G)*100,
-    'Colors': chromatic_numbers[problem_file],
+    'Colors': 3,
     'Chromatic Number': upper_chromatic_number.item(),
     'GCN Cost': best_cost,
     'Error %':(best_cost/len(G.edges))*100,
